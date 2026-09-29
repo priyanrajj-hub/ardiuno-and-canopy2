@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Canopy – Plant Health Monitor</title>
+    <style>
+        :root {
+            --bg: #eef2ea;
+            --panel: #fbfcf8;
+            --ink: #1d2b22;
+            --mute: #5d6e62;
+            --line: #d5dccf;
+            --ok: #2f7d4f;
+            --warn: #b7791f;
+            --bad: #b23a3a;
+            --leaf: #2f7d4f;
+            --sky: #2b6c8f
+        }
+
+        @media(prefers-color-scheme:dark) {
+            :root {
+                --bg: #121a15;
+                --panel: #1a251e;
+                --ink: #e4ede6;
+                --mute: #93a598;
+                --line: #2b3a30;
+                --ok: #5cc383;
+                --warn: #e0a94a;
+                --bad: #e27070;
+                --leaf: #5cc383;
+                --sky: #6fb5d8
+            }
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--ink);
+            font: 15px/1.5 "Segoe UI", system-ui, sans-serif
+        }
+
+        header {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px clamp(16px, 4vw, 48px);
+            border-bottom: 1px solid var(--line)
+        }
+
+        h1 {
+            margin: 0;
+            font: 600 22px Georgia, serif
+        }
+
+        h1 small {
+            display: block;
+            font: 400 13px "Segoe UI", sans-serif;
+            color: var(--mute)
+        }
+
+        .ctl {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center
+        }
+
+        button {
+            font: inherit;
+            padding: 8px 14px;
+            border-radius: 6px;
+            border: 1px solid var(--line);
+            background: var(--panel);
+            color: var(--ink);
+            cursor: pointer
+        }
+
+        button.primary {
+            background: var(--leaf);
+            border-color: var(--leaf);
+            color: #fff
+        }
+
+        button:focus-visible,
+        input:focus-visible {
+            outline: 2px solid var(--sky);
+            outline-offset: 2px
+        }
+
+        .status {
+            font-size: 13px;
+            color: var(--mute);
+            display: flex;
+            align-items: center;
+            gap: 6px
+        }
+
+        .dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: var(--mute)
+        }
+
+        .dot.live {
+            background: var(--ok)
+        }
+
+        main {
+            padding: 24px clamp(16px, 4vw, 48px);
+            display: grid;
+            gap: 20px;
+            max-width: 1200px;
+            margin: auto
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 28px;
+            align-items: center;
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 24px
+        }
+
+        .ring {
+            position: relative;
+            width: 150px;
+            height: 150px
+        }
+
+        .ring svg {
+            transform: rotate(-90deg)
+        }
+
+        .ring b {
+            position: absolute;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            font: 600 38px Georgia, serif
+        }
+
+        .hero h2 {
+            margin: 0 0 6px;
+            font: 600 24px Georgia, serif
+        }
+
+        .hero p {
+            margin: 0;
+            color: var(--mute);
+            max-width: 60ch
+        }
+
+        #alerts {
+            margin: 12px 0 0;
+            padding: 0;
+            list-style: none;
+            display: grid;
+            gap: 6px
+        }
+
+        #alerts li {
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 14px;
+            border-left: 4px solid var(--warn);
+            background: color-mix(in srgb, var(--warn) 12%, transparent)
+        }
+
+        #alerts li.bad {
+            border-color: var(--bad);
+            background: color-mix(in srgb, var(--bad) 12%, transparent)
+        }
+
+        #alerts li.ok {
+            border-color: var(--ok);
+            background: color-mix(in srgb, var(--ok) 12%, transparent)
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 14px
+        }
+
+        .card {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 16px
+        }
+
+        .card h3 {
+            margin: 0 0 4px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--mute)
+        }
+
+        .val {
+            font: 600 30px Georgia, serif
+        }
+
+        .val small {
+            font: 400 14px "Segoe UI", sans-serif;
+            color: var(--mute)
+        }
+
+        .sub {
+            font-size: 13px;
+            color: var(--mute);
+            min-height: 20px
+        }
+
+        .bar {
+            height: 6px;
+            border-radius: 3px;
+            background: var(--line);
+            margin-top: 8px;
+            overflow: hidden
+        }
+
+        .bar i {
+            display: block;
+            height: 100%;
+            width: 0;
+            background: var(--leaf);
+            transition: width .4s
+        }
+
+        .chartbox {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 16px
+        }
+
+        .chartbox header {
+            padding: 0 0 8px;
+            border: 0
+        }
+
+        canvas {
+            width: 100%;
+            height: 220px;
+            display: block
+        }
+
+        .legend {
+            display: flex;
+            gap: 14px;
+            font-size: 13px;
+            color: var(--mute);
+            flex-wrap: wrap
+        }
+
+        .legend span::before {
+            content: "";
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+            margin-right: 5px;
+            background: var(--c)
+        }
+
+        .cal {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: end;
+            font-size: 13px;
+            color: var(--mute)
+        }
+
+        .cal label {
+            display: grid;
+            gap: 3px
+        }
+
+        input {
+            width: 110px;
+            padding: 7px;
+            border-radius: 6px;
+            border: 1px solid var(--line);
+            background: var(--bg);
+            color: var(--ink);
+            font: inherit
+        }
+
+        pre {
+            margin: 0;
+            max-height: 160px;
+            overflow: auto;
+            font: 12px/1.4 Consolas, monospace;
+            color: var(--mute);
+            white-space: pre-wrap
+        }
+
+        .note {
+            font-size: 13px;
+            color: var(--mute)
+        }
+
+        @media(max-width:560px) {
+            .hero {
+                grid-template-columns: 1fr;
+                justify-items: center;
+                text-align: center
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Canopy<small>Plant health monitor · Arduino Uno</small></h1>
+        <div class="ctl">
+            <span class="status"><span class="dot" id="dot"></span><span id="stat">Not connected</span></span>
+            <button class="primary" id="btnConn">Connect Arduino</button>
+            <button id="btnDemo">Demo data</button>
+            <button id="btnCsv">Export CSV</button>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="ring">
+                <svg width="150" height="150" viewBox="0 0 150 150">
+                    <circle cx="75" cy="75" r="64" fill="none" stroke="var(--line)" stroke-width="12" />
+                    <circle id="arc" cx="75" cy="75" r="64" fill="none" stroke="var(--ok)" stroke-width="12"
+                        stroke-linecap="round" stroke-dasharray="402" stroke-dashoffset="402"
+                        style="transition:stroke-dashoffset .6s,stroke .6s" />
+                </svg>
+                <b id="score">--</b>
+            </div>
+            <div>
+                <h2 id="verdict">Waiting for sensor data</h2>
+                <p id="advice">Connect your Arduino (9600 baud) or press Demo data. The health score combines soil
+                    moisture, temperature, humidity, light and air quality.</p>
+                <ul id="alerts"></ul>
+            </div>
+        </section>
+
+        <section class="grid">
+            <div class="card">
+                <h3>Temperature (DHT11)</h3>
+                <div class="val" id="t">--<small> °C</small></div>
+                <div class="sub" id="tS"></div>
+            </div>
+            <div class="card">
+                <h3>Air humidity (DHT11)</h3>
+                <div class="val" id="h">--<small> %</small></div>
+                <div class="sub" id="hS"></div>
+                <div class="bar"><i id="hB"></i></div>
+            </div>
+            <div class="card">
+                <h3>Soil moisture (A0)</h3>
+                <div class="val" id="s">--<small> %</small></div>
+                <div class="sub" id="sS">Raw: --</div>
+                <div class="bar"><i id="sB" style="background:var(--sky)"></i></div>
+            </div>
+            <div class="card">
+                <h3>Light (LDR)</h3>
+                <div class="val" id="l">--</div>
+                <div class="sub" id="lS">Time in light today: --</div>
+            </div>
+            <div class="card">
+                <h3>Air quality (MQ)</h3>
+                <div class="val" id="g">--</div>
+                <div class="sub" id="gS">Raw: --</div>
+                <div class="bar"><i id="gB" style="background:var(--warn)"></i></div>
+            </div>
+            <div class="card">
+                <h3>Rain sensor (A1)</h3>
+                <div class="val" id="r">--</div>
+                <div class="sub" id="rS">Raw: --</div>
+            </div>
+            <div class="card">
+                <h3>Sound (D6)</h3>
+                <div class="val" id="n">--</div>
+                <div class="sub">Threshold set on module</div>
+            </div>
+            <div class="card">
+                <h3>Distance (HC-SR04)</h3>
+                <div class="val" id="d">--<small> cm</small></div>
+                <div class="sub" id="dS">Plant height / water level</div>
+            </div>
+        </section>
+
+        <section class="chartbox">
+            <header><strong>Trends</strong>
+                <div class="legend"><span style="--c:#d0623a">Temp °C</span><span style="--c:#2b6c8f">Soil %</span><span
+                        style="--c:#7a8f3a">Humidity %</span></div>
+            </header>
+            <canvas id="chart" role="img" aria-label="Line chart of temperature, soil moisture and humidity"></canvas>
+        </section>
+
+        <section class="card w-full" style="grid-column: 1 / -1">
+            <h3>Sensor Calibration Toolkit</h3>
+            <div class="cal" style="gap: 20px; align-items: flex-start;">
+                <div style="display:flex; gap:12px; flex-wrap:wrap">
+                    <label>Soil Raw (Dry Air)<input type="number" id="dry" value="700"></label>
+                    <label>Soil Raw (Water)<input type="number" id="wet" value="300"></label>
+                </div>
+                <div style="display:flex; gap:12px; flex-wrap:wrap">
+                    <label>Rain Raw (Rain)<input type="number" id="rWet" value="600"
+                            title="Values above this are considered Rain"></label>
+                    <label>Rain Raw (Heavy)<input type="number" id="rHeavy" value="750"
+                            title="Values above this are considered Heavy Rain"></label>
+                </div>
+                <button id="btnCal" class="primary" style="align-self: center">Save Calibration</button>
+                <span style="flex-basis: 100%">Adjust these baseline physical constraints to perfectly match your
+                    hardware's natural environmental drift. Saved automatically to your browser.</span>
+            </div>
+        </section>
+
+        <section class="card" style="grid-column: 1 / -1">
+            <h3>Serial log</h3>
+            <pre id="log">No data yet.</pre>
+        </section>
+        <p class="note" style="grid-column: 1 / -1">Web Serial works in Chrome or Edge on desktop, and the file must be
+            opened from your computer (or https/localhost). Close the Arduino Serial Monitor first, since only one
+            program can use the port.</p>
+    </main>
+
+    <script>
+        const $ = id => document.getElementById(id);
+        let cal = { dry: 700, wet: 300, rainWet: 600, rainHeavy: 750 };
+        try {
+            const c = JSON.parse(localStorage.getItem('cal') || 'null');
+            if (c) {
+                // Wipe cache if it contains old schema to prevent inversion conflicts
+                if (c.rainDry !== undefined) {
+                    localStorage.removeItem('cal');
+                } else {
+                    cal = { ...cal, ...c };
+                }
+            }
+        } catch (e) { }
+        $('dry').value = cal.dry; $('wet').value = cal.wet;
+        $('rWet').value = cal.rainWet; $('rHeavy').value = cal.rainHeavy;
+        $('btnCal').onclick = () => {
+            cal = {
+                dry: +$('dry').value,
+                wet: +$('wet').value,
+                rainWet: +$('rWet').value,
+                rainHeavy: +$('rHeavy').value
+            };
+            try { localStorage.setItem('cal', JSON.stringify(cal)) } catch (e) { }
+            alert("Calibration Saved!");
+        };
+
+        const hist = []; let lightSecs = 0, totalSecs = 0;
+        let cur = {}, section = 0, demoTimer = null, port = null, reader = null;
+
+        // ---------- Parsing the Arduino text output ----------
+        function parseLine(line) {
+            let m;
+            if ((m = line.match(/^\[(\d)\]/))) { section = +m[1]; return }
+            if (/SENSOR READINGS/.test(line)) { cur = {}; return }
+            if ((m = line.match(/Temperature\s*:\s*([\d.\-]+)/))) cur.t = +m[1];
+            else if (/Temperature\s*:\s*ERROR/.test(line)) { cur.t = null; cur.h = null }
+            else if ((m = line.match(/Humidity\s*:\s*([\d.\-]+)/))) cur.h = +m[1];
+            else if ((m = line.match(/Raw Value\s*:\s*(\d+)/))) cur.soil = +m[1];
+            else if ((m = line.match(/Analog AO\s*:\s*(\d+)/))) { if (section === 3) cur.gas = +m[1]; if (section === 6) cur.rain = +m[1] }
+            else if ((m = line.match(/Digital DO\s*:\s*(.+)/))) {
+                const v = m[1].trim();
+                if (section === 3) cur.gasAlarm = /EXCEEDED/.test(v);
+                if (section === 4) cur.light = /LIGHT/.test(v);
+                if (section === 5) cur.sound = /DETECTED/.test(v)
+            }
+            else if ((m = line.match(/Distance\s*:\s*([\d.]+)\s*cm/))) cur.d = +m[1];
+            else if (/Distance\s*:\s*NO ECHO/.test(line)) cur.d = null;
+            if (/^-{20,}$/.test(line.trim()) && section === 7 && cur.soil !== undefined) { commit() }
+        }
+
+        function soilPct(raw) { const p = (cal.dry - raw) / (cal.dry - cal.wet) * 100; return Math.max(0, Math.min(100, Math.round(p))) }
+
+        function commit() {
+            const d = { ...cur, time: new Date() }; d.soilPct = soilPct(d.soil);
+            hist.push(d); if (hist.length > 300) hist.shift();
+            totalSecs += 2; if (d.light) lightSecs += 2;
+            render(d); cur = {}; section = 0;
+        }
+
+        // ---------- Health scoring ----------
+        function score(d) {
+            const alerts = []; let s = 100;
+            const pen = (n, msg, lvl) => { s -= n; alerts.push([lvl, msg]) };
+            if (d.soilPct < 25) pen(30, 'Soil is dry (' + d.soilPct + '%). Water the plant.', 'bad');
+            else if (d.soilPct < 40) pen(12, 'Soil moisture is getting low (' + d.soilPct + '%).', 'warn');
+            else if (d.soilPct > 85) pen(15, 'Soil is waterlogged (' + d.soilPct + '%). Risk of root rot.', 'warn');
+            if (d.t != null) {
+                if (d.t > 35) pen(25, 'Too hot (' + d.t + ' °C). Provide shade or ventilation.', 'bad');
+                else if (d.t > 30) pen(10, 'Warm (' + d.t + ' °C).', 'warn');
+                else if (d.t < 10) pen(25, 'Too cold (' + d.t + ' °C).', 'bad');
+                else if (d.t < 15) pen(10, 'Cool (' + d.t + ' °C).', 'warn');
+            }
+            if (d.h != null) {
+                if (d.h < 30) pen(12, 'Air is very dry (' + d.h + '%). Consider misting.', 'warn');
+                else if (d.h > 85) pen(10, 'Air is very humid (' + d.h + '%). Watch for fungus.', 'warn');
+            }
+            if (d.gasAlarm) pen(20, 'Gas sensor threshold exceeded. Check ventilation.', 'bad');
+            if (totalSecs > 300 && lightSecs / totalSecs < 0.25) pen(8, 'Low light exposure in this session.', 'warn');
+            if (!alerts.length) alerts.push(['ok', 'All readings are in the healthy range.']);
+            return { s: Math.max(0, Math.round(s)), alerts };
+        }
+
+        function render(d) {
+            $('t').firstChild.nodeValue = d.t == null ? 'ERR' : d.t.toFixed(1);
+            $('tS').textContent = d.t == null ? 'Check DHT11 wiring on D13' : d.t < 15 ? 'Cool' : d.t > 30 ? 'Warm' : 'Comfortable';
+            $('h').firstChild.nodeValue = d.h == null ? 'ERR' : d.h.toFixed(0);
+            $('hB').style.width = (d.h || 0) + '%'; $('hS').textContent = d.h == null ? '' : d.h < 30 ? 'Dry air' : d.h > 85 ? 'Very humid' : 'Good';
+            $('s').firstChild.nodeValue = d.soilPct; $('sS').textContent = 'Raw: ' + d.soil; $('sB').style.width = d.soilPct + '%';
+            $('l').textContent = d.light ? 'Light' : 'Dark';
+            $('lS').textContent = 'Light this session: ' + (totalSecs ? Math.round(lightSecs / totalSecs * 100) : 0) + '%';
+            $('g').textContent = d.gasAlarm ? 'Alert' : 'Normal'; $('gS').textContent = 'Raw: ' + d.gas; $('gB').style.width = Math.min(100, d.gas / 10.23) + '%';
+            const rHeavy = cal.rainHeavy || 750;
+            const rWet = cal.rainWet || 600;
+            $('r').textContent = d.rain >= rHeavy ? 'Heavy Rain' : d.rain >= rWet ? 'Rain' : 'Dry'; $('rS').textContent = 'Raw: ' + d.rain;
+            $('n').textContent = d.sound ? 'Detected' : 'Quiet';
+            $('d').firstChild.nodeValue = d.d == null ? '--' : d.d.toFixed(1); $('dS').textContent = d.d == null ? 'No echo received' : 'Plant height / water level';
+            const { s, alerts } = score(d);
+            $('score').textContent = s;
+            const arc = $('arc'); arc.style.strokeDashoffset = 402 * (1 - s / 100);
+            arc.style.stroke = s >= 75 ? 'var(--ok)' : s >= 50 ? 'var(--warn)' : 'var(--bad)';
+            $('verdict').textContent = s >= 75 ? 'Your plant is healthy' : s >= 50 ? 'Needs attention' : 'Plant is stressed';
+            $('advice').textContent = 'Last update ' + d.time.toLocaleTimeString() + '. Score is based on soil, temperature, humidity, light and air quality.';
+            $('alerts').innerHTML = alerts.map(a => `<li class="${a[0]}">${a[1]}</li>`).join('');
+            draw();
+        }
+
+        // ---------- Chart ----------
+        function draw() {
+            const c = $('chart'), dpr = devicePixelRatio || 1, w = c.clientWidth, h = c.clientHeight;
+            c.width = w * dpr; c.height = h * dpr; const x = c.getContext('2d'); x.scale(dpr, dpr); x.clearRect(0, 0, w, h);
+            const line = getComputedStyle(document.body).getPropertyValue('--line'), mute = getComputedStyle(document.body).getPropertyValue('--mute');
+            x.strokeStyle = line; x.fillStyle = mute; x.font = '11px sans-serif';
+            for (let i = 0; i <= 4; i++) { const y = 10 + (h - 30) * i / 4; x.beginPath(); x.moveTo(30, y); x.lineTo(w, y); x.stroke(); x.fillText(100 - i * 25, 4, y + 4) }
+            const series = [['t', '#d0623a', 1], ['soilPct', '#2b6c8f', 1], ['h', '#7a8f3a', 1]];
+            series.forEach(([k, col]) => {
+                x.strokeStyle = col; x.lineWidth = 2; x.beginPath(); let st = false;
+                hist.forEach((p, i) => {
+                    if (p[k] == null) return; const X = 30 + (w - 34) * (hist.length < 2 ? 0 : i / (hist.length - 1)), Y = 10 + (h - 30) * (1 - Math.min(100, p[k]) / 100);
+                    st ? x.lineTo(X, Y) : x.moveTo(X, Y); st = true
+                }); x.stroke()
+            });
+        }
+        addEventListener('resize', draw);
+
+        // ---------- Web Serial ----------
+        function setStatus(txt, live) { $('stat').textContent = txt; $('dot').className = 'dot' + (live ? ' live' : '') }
+        const logLines = [];
+        function feed(line) { line = line.replace(/\r/g, ''); logLines.push(line); if (logLines.length > 40) logLines.shift(); $('log').textContent = logLines.join('\n'); parseLine(line) }
+
+        $('btnConn').onclick = async () => {
+            if (port) { try { reader && await reader.cancel() } catch (e) { } return }
+            if (!('serial' in navigator)) { alert('Web Serial is not supported here. Open this file in Chrome or Edge on a computer, or use Demo data.'); return }
+            try {
+                stopDemo();
+                port = await navigator.serial.requestPort();
+                await port.open({ baudRate: 9600 });
+                setStatus('Connected (9600 baud)', true); $('btnConn').textContent = 'Disconnect';
+                const dec = new TextDecoderStream(); port.readable.pipeTo(dec.writable).catch(() => { });
+                reader = dec.readable.getReader(); let buf = '';
+                while (true) {
+                    const { value, done } = await reader.read(); if (done) break; buf += value; let i;
+                    while ((i = buf.indexOf('\n')) >= 0) { feed(buf.slice(0, i)); buf = buf.slice(i + 1) }
+                }
+            } catch (e) { setStatus('Connection failed: ' + e.message, false) }
+            finally { try { reader && reader.releaseLock() } catch (e) { } try { port && await port.close() } catch (e) { } port = null; reader = null; $('btnConn').textContent = 'Connect Arduino'; if ($('stat').textContent.startsWith('Connected')) setStatus('Disconnected', false) }
+        };
+
+        // ---------- Demo mode (same text format as your sketch) ----------
+        function stopDemo() { clearInterval(demoTimer); demoTimer = null; $('btnDemo').textContent = 'Demo data' }
+        $('btnDemo').onclick = () => {
+            if (demoTimer) { stopDemo(); setStatus('Not connected', false); return }
+            let k = 0; $('btnDemo').textContent = 'Stop demo'; setStatus('Demo mode', true);
+            const tick = () => {
+                k++;
+                const t = (26 + 3 * Math.sin(k / 8)).toFixed(1), h = (58 + 8 * Math.cos(k / 10)).toFixed(1);
+                const soil = Math.round(430 + Math.max(0, 120 - k * 2) % 200 + 60 * Math.sin(k / 6));
+                const txt = `------------------------------------------------
+                SENSOR READINGS
+------------------------------------------------
+[1] DHT11 - D13
+Temperature : ${t} °C
+Humidity    : ${h} %
+
+[2] CAPACITIVE SOIL MOISTURE - A0
+Raw Value   : ${soil}
+
+[3] MQ GAS SENSOR
+Analog AO   : ${Math.round(180 + 40 * Math.random())}
+Digital DO  : ${k % 37 === 0 ? 'THRESHOLD EXCEEDED' : 'NORMAL'}
+
+[4] LDR - D4
+Digital DO  : ${k % 20 < 13 ? 'LIGHT' : 'DARK'}
+
+[5] SOUND SENSOR - D6
+Digital DO  : ${Math.random() < .1 ? 'SOUND DETECTED' : 'NO SOUND / BELOW THRESHOLD'}
+
+[6] RAIN SENSOR - A1
+Analog AO   : ${Math.round(950 - 60 * Math.random())}
+
+[7] HC-SR04
+Distance    : ${(22 + 2 * Math.random()).toFixed(2)} cm
+------------------------------------------------`;
+                txt.split('\n').forEach(feed)
+            };
+            tick(); demoTimer = setInterval(tick, 1000);
+        };
+
+        // ---------- CSV ----------
+        $('btnCsv').onclick = () => {
+            if (!hist.length) { alert('No readings to export yet.'); return }
+            const rows = ['time,temp_c,humidity,soil_raw,soil_pct,gas_raw,gas_alarm,light,sound,rain_raw,distance_cm'];
+            hist.forEach(p => rows.push([p.time.toISOString(), p.t, p.h, p.soil, p.soilPct, p.gas, p.gasAlarm, p.light, p.sound, p.rain, p.d].join(',')));
+            const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([rows.join('\n')], { type: 'text/csv' }));
+            a.download = 'plant-readings.csv'; a.click();
+        };
+    </script>
+</body>
+
+</html>
