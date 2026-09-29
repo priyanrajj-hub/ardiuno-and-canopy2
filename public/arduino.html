@@ -518,11 +518,36 @@
             return { s: Math.max(0, Math.round(s)), alerts };
         }
 
+        let weatherCache = { t: null, h: null };
+        function fetchWeatherFallback() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(async (pos) => {
+                    try {
+                        const { latitude, longitude } = pos.coords;
+                        const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m`);
+                        const data = await res.json();
+                        weatherCache.t = data.current.temperature_2m;
+                        weatherCache.h = data.current.relative_humidity_2m;
+                    } catch (e) { console.warn('Weather fallback failed', e); }
+                });
+            }
+        }
+        fetchWeatherFallback();
+        setInterval(fetchWeatherFallback, 300000); // 5 min interval
+
         function render(d) {
-            $('t').firstChild.nodeValue = d.t == null ? 'ERR' : d.t.toFixed(1);
-            $('tS').textContent = d.t == null ? 'Check DHT11 wiring on D13' : d.t < 15 ? 'Cool' : d.t > 30 ? 'Warm' : 'Comfortable';
-            $('h').firstChild.nodeValue = d.h == null ? 'ERR' : d.h.toFixed(0);
-            $('hB').style.width = (d.h || 0) + '%'; $('hS').textContent = d.h == null ? '' : d.h < 30 ? 'Dry air' : d.h > 85 ? 'Very humid' : 'Good';
+            const temp = d.t != null ? d.t : weatherCache.t;
+            const hum = d.h != null ? d.h : weatherCache.h;
+
+            $('t').firstChild.nodeValue = temp == null ? 'ERR' : temp.toFixed(1);
+            $('tS').textContent = d.t == null && temp != null ? 'Hardware faulted: Live Satellite Fallback Active' : d.t == null ? 'Check DHT11 wiring on D13' : temp < 15 ? 'Cool' : temp > 30 ? 'Warm' : 'Comfortable';
+            if (d.t == null && temp != null) $('tS').style.color = 'var(--warn)'; else $('tS').style.color = 'var(--mute)';
+
+            $('h').firstChild.nodeValue = hum == null ? 'ERR' : hum.toFixed(0);
+            $('hB').style.width = (hum || 0) + '%';
+            $('hS').textContent = d.h == null && hum != null ? 'Hardware faulted: Satellite Fallback' : d.h == null ? '' : hum < 30 ? 'Dry air' : hum > 85 ? 'Very humid' : 'Good';
+            if (d.h == null && hum != null) $('hS').style.color = 'var(--warn)'; else $('hS').style.color = 'var(--mute)';
+
             $('s').firstChild.nodeValue = d.soilPct; $('sS').textContent = 'Raw: ' + d.soil; $('sB').style.width = d.soilPct + '%';
             $('l').textContent = d.light ? 'Light' : 'Dark';
             $('lS').textContent = 'Light this session: ' + (totalSecs ? Math.round(lightSecs / totalSecs * 100) : 0) + '%';
