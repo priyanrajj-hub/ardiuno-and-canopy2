@@ -27,11 +27,11 @@ export async function POST(request: Request) {
                         status: 'SUCCESS',
                         metrics: {
                             ndvi_mean: 0.584,
-                            ndvi_error: 'Simulated Data (Python execution failed on Vercel Serverless, substituting synthetic NDVI)',
+                            ndvi_error: 'Simulated Data (Python Serverless Fault)',
                             stac_source: 'synthetic-sentinel-2-vercel-fallback',
                             weather: {
-                                temperature: 31.9,
-                                humidity: 62,
+                                temperature_2m: 31.9,
+                                relative_humidity_2m: 62,
                                 precipitation: 0
                             }
                         }
