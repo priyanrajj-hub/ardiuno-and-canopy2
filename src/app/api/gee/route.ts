@@ -16,7 +16,7 @@ export async function POST(request: Request) {
             }, { status: 400 });
         }
 
-        return new Promise((resolve) => {
+        return new Promise<NextResponse>((resolve) => {
             const scriptPath = path.join(process.cwd(), 'src', 'scripts', 'extractor.py');
             const cmd = `python "${scriptPath}" --lat ${center_lat} --lon ${center_lng}`;
 
