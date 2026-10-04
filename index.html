@@ -63,38 +63,31 @@
                 </div>
             </div>
 
-            <div class="glass-card stat-card accent-blue">
-                <div class="glass-card">
-                    <div class="stat-header" data-i18n="humidity">HUMIDITY</div>
-                    <div class="stat-value"><span id="val-hum">--</span><span class="unit">%</span></div>
-                    <div class="progress-container">
-                        <div class="progress-bar" id="bar-hum" style="background:var(--neon-blue);"></div>
-                    </div>
-                </div>
-
-                <div class="glass-card">
-                    <div class="stat-header" data-i18n="soil">SOIL MOISTURE</div>
-                    <div class="stat-value"><span id="val-soil">--</span><span class="unit">%</span></div>
-                    <div class="val-sub"><span id="val-soil-mv">0</span> mV</div>
-                    <div class="progress-container">
-                        <div class="progress-bar" id="bar-soil" style="background:var(--neon-emerald);"></div>
-                    </div>
-                </div>
-
-                <div class="glass-card">
-                    <div class="stat-header" data-i18n="light">LIGHT LEVEL</div>
-                    <div class="stat-value"><span id="val-light">--</span><span class="unit">%</span></div>
-                    <div class="progress-container">
-                        <div class="progress-bar" id="bar-light" style="background:var(--neon-amber);"></div>
-                    </div>
+            <div class="glass-card">
+                <div class="stat-header" data-i18n="humidity">HUMIDITY</div>
+                <div class="stat-value"><span id="val-hum">--</span><span class="unit">%</span></div>
+                <div class="progress-container">
+                    <div class="progress-bar" id="bar-hum" style="background:var(--neon-blue);"></div>
                 </div>
             </div>
-    </div>
 
-    <!-- ADVANCED SENSORS (Full Width / Grid) -->
-    <div class="glass-card adv-card span-2">
-        <div class="adv-header">
-            <h3>Chemical Analysis (pH)</h3>
+            <div class="glass-card">
+                <div class="stat-header" data-i18n="soil">SOIL MOISTURE</div>
+                <div class="stat-value"><span id="val-soil">--</span><span class="unit">%</span></div>
+                <div class="val-sub"><span id="val-soil-mv">0</span> mV</div>
+                <div class="progress-container">
+                    <div class="progress-bar" id="bar-soil" style="background:var(--neon-emerald);"></div>
+                </div>
+            </div>
+
+            <div class="glass-card">
+                <div class="stat-header" data-i18n="light">LIGHT LEVEL</div>
+                <div class="stat-value"><span id="val-light">--</span><span class="unit">%</span></div>
+                <div class="progress-container">
+                    <div class="progress-bar" id="bar-light" style="background:var(--neon-amber);"></div>
+                </div>
+            </div>
+
             <div class="glass-card span-2 row-flex">
                 <div style="flex: 1;">
                     <div class="stat-header" data-i18n="ph">Chemical Analysis (pH)</div>
@@ -199,7 +192,8 @@
                         style="text-align: center; width: 100%; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 1rem;">
                         <div class="stat-header" data-i18n="live_prediction">LIVE ML PREDICTION</div>
                         <div class="stat-value" style="font-size: 1.5rem; color: var(--neon-amber); margin-top: 5px;">
-                            <span id="ml-prediction" data-i18n="waiting">Waiting...</span></div>
+                            <span id="ml-prediction" data-i18n="waiting">Waiting...</span>
+                        </div>
                         <div class="val-sub" style="margin-top: 5px;"><span data-i18n="confidence">Confidence:</span>
                             <span id="ml-confidence">0</span>%
                         </div>
@@ -218,78 +212,78 @@
                 </div>
             </div>
 
-            </main>
+        </main>
 
-            <!-- SENSOR DOCUMENTATION SECTION -->
-            <div class="glass-card" style="margin-top: 2rem; border-top: 2px solid var(--neon-cyan); padding: 1.5rem;">
-                <h3
-                    style="color: var(--neon-cyan); margin-bottom: 1rem; text-transform: uppercase; font-size: 1rem; letter-spacing: 2px;">
-                    Hardware &amp; Sensor Mapping</h3>
-                <p style="color: var(--text-dim); margin-bottom: 1.5rem; font-size: 0.9rem; line-height: 1.6;">
-                    This matrix serves as the unified hardware ground-truth for the system. Note: Certain sensors (like
-                    the
-                    Rain and IR sensors) may exhibit floating values when partially unplugged indoors.
-                </p>
+        <!-- SENSOR DOCUMENTATION SECTION -->
+        <div class="glass-card" style="margin-top: 2rem; border-top: 2px solid var(--neon-cyan); padding: 1.5rem;">
+            <h3
+                style="color: var(--neon-cyan); margin-bottom: 1rem; text-transform: uppercase; font-size: 1rem; letter-spacing: 2px;">
+                Hardware &amp; Sensor Mapping</h3>
+            <p style="color: var(--text-dim); margin-bottom: 1.5rem; font-size: 0.9rem; line-height: 1.6;">
+                This matrix serves as the unified hardware ground-truth for the system. Note: Certain sensors (like
+                the
+                Rain and IR sensors) may exhibit floating values when partially unplugged indoors.
+            </p>
 
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
-                    <!-- Sensor Items -->
-                    <div
-                        style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
-                        <div style="color: var(--text-glow); margin-bottom: 0.5rem; font-weight: 600;">DHT11
-                            (Temp/Humidity)
-                        </div>
-                        <div style="font-size: 0.8rem; color: var(--text-dim);">Tied to Arduino D3. Tracks ambient
-                            vegetative climate. Generates AL_TEMPH / AL_TEMPL alerts.</div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
+                <!-- Sensor Items -->
+                <div
+                    style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
+                    <div style="color: var(--text-glow); margin-bottom: 0.5rem; font-weight: 600;">DHT11
+                        (Temp/Humidity)
                     </div>
+                    <div style="font-size: 0.8rem; color: var(--text-dim);">Tied to Arduino D3. Tracks ambient
+                        vegetative climate. Generates AL_TEMPH / AL_TEMPL alerts.</div>
+                </div>
 
-                    <div
-                        style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
-                        <div style="color: var(--neon-amber); margin-bottom: 0.5rem; font-weight: 600;">MQ Gas Sensor
-                        </div>
-                        <div style="font-size: 0.8rem; color: var(--text-dim);">Analog AO -> ADS1115 A2 | Digital DO ->
-                            Arduino D4. Highly sensitive to indoor organic compounds.</div>
+                <div
+                    style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
+                    <div style="color: var(--neon-amber); margin-bottom: 0.5rem; font-weight: 600;">MQ Gas Sensor
                     </div>
+                    <div style="font-size: 0.8rem; color: var(--text-dim);">Analog AO -> ADS1115 A2 | Digital DO ->
+                        Arduino D4. Highly sensitive to indoor organic compounds.</div>
+                </div>
 
-                    <div
-                        style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
-                        <div style="color: var(--neon-blue); margin-bottom: 0.5rem; font-weight: 600;">Capacitive Soil
-                            Sensor</div>
-                        <div style="font-size: 0.8rem; color: var(--text-dim);">Analog AO -> ADS1115 A0. Measures
-                            dielectric
-                            permittivity of surrounding medium.</div>
-                    </div>
+                <div
+                    style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
+                    <div style="color: var(--neon-blue); margin-bottom: 0.5rem; font-weight: 600;">Capacitive Soil
+                        Sensor</div>
+                    <div style="font-size: 0.8rem; color: var(--text-dim);">Analog AO -> ADS1115 A0. Measures
+                        dielectric
+                        permittivity of surrounding medium.</div>
+                </div>
 
-                    <div
-                        style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
-                        <div style="color: var(--neon-purple); margin-bottom: 0.5rem; font-weight: 600;">pH Interface
-                            Board
-                        </div>
-                        <div style="font-size: 0.8rem; color: var(--text-dim);">Analog PO -> ADS1115 A3. BNC probe
-                            measuring
-                            acidic/alkaline biomass levels.</div>
+                <div
+                    style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
+                    <div style="color: var(--neon-purple); margin-bottom: 0.5rem; font-weight: 600;">pH Interface
+                        Board
                     </div>
+                    <div style="font-size: 0.8rem; color: var(--text-dim);">Analog PO -> ADS1115 A3. BNC probe
+                        measuring
+                        acidic/alkaline biomass levels.</div>
+                </div>
 
-                    <div
-                        style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
-                        <div style="color: #fff; margin-bottom: 0.5rem; font-weight: 600;">Rain &amp; LDR Sensors</div>
-                        <div style="font-size: 0.8rem; color: var(--text-dim);">Rain AO -> Arduino A3. LDR AO -> ADS1115
-                            A1.
-                            Indoor testing usually saturates rain values due to module variance.</div>
-                    </div>
+                <div
+                    style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
+                    <div style="color: #fff; margin-bottom: 0.5rem; font-weight: 600;">Rain &amp; LDR Sensors</div>
+                    <div style="font-size: 0.8rem; color: var(--text-dim);">Rain AO -> Arduino A3. LDR AO -> ADS1115
+                        A1.
+                        Indoor testing usually saturates rain values due to module variance.</div>
+                </div>
 
-                    <div
-                        style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
-                        <div style="color: var(--neon-red); margin-bottom: 0.5rem; font-weight: 600;">IR &amp; Sound
-                            Events
-                        </div>
-                        <div style="font-size: 0.8rem; color: var(--text-dim);">IR OUT -> D5 (Motion detection). Sound
-                            ->
-                            D13 (Acoustic disturbances).</div>
+                <div
+                    style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
+                    <div style="color: var(--neon-red); margin-bottom: 0.5rem; font-weight: 600;">IR &amp; Sound
+                        Events
                     </div>
+                    <div style="font-size: 0.8rem; color: var(--text-dim);">IR OUT -> D5 (Motion detection). Sound
+                        ->
+                        D13 (Acoustic disturbances).</div>
                 </div>
             </div>
-
         </div>
+
+    </div>
 
 </body>
 
